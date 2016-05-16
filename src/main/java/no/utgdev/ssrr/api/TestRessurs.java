@@ -1,5 +1,7 @@
 package no.utgdev.ssrr.api;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -11,10 +13,14 @@ import java.util.Map;
 @Produces(MediaType.APPLICATION_JSON)
 public class TestRessurs {
 
+    @Inject
+    @Named("testbean")
+    public String value;
+
     @GET
     public Map<String, String> doTest() {
         return new HashMap<String, String>() {{
-            put("status", "oks");
+            put("status", "oks" + value);
         }};
     }
 }

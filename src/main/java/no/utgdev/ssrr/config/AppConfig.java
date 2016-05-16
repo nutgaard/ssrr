@@ -2,15 +2,13 @@ package no.utgdev.ssrr.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 
 @Configuration
-@Import({
-        ApiConfig.class
-})
 public class AppConfig {
-    @Bean
+
+    @Bean(name = "testbean")
     public String test() {
-        return "";
+        return "BeanValue";
     }
+
 }
