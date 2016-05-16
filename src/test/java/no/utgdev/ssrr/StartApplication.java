@@ -9,6 +9,7 @@ public class StartApplication {
 
         String rootPath = StartApplication.class.getClassLoader().getResource(".").toString();
         WebAppContext webapp = new WebAppContext(rootPath + "../../src/main/webapp", "");
+        webapp.setInitParameter("org.eclipse.jetty.servlet.Default.useFileMappedBuffer", "false");
 
         server.setHandler(webapp);
 

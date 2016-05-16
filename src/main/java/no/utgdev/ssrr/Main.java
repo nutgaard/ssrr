@@ -16,22 +16,26 @@ public class Main extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        final RequestDispatcher dispatcher = getServletContext().getNamedDispatcher("default");
         boolean isFile = filepattern.matcher(req.getRequestURI()).find();
-        if (!isFile) {
-            req.getRequestDispatcher("/index.html").forward(req, resp);
-        } else {
-            RequestDispatcher dispatcher = getServletContext().getNamedDispatcher("default");
-            HttpServletRequest wrapper = getHttpServletRequest(req, "");
-            dispatcher.forward(wrapper, resp);
-        }
+
+        final String resource = isFile ? req.getRequestURI() : "/index.html";
+        final HttpServletRequest wrapper = getHttpServletRequest(req, resource);
+
+        dispatcher.forward(wrapper, resp);
     }
 
     private HttpServletRequest getHttpServletRequest(final HttpServletRequest req, final String url) {
         return new HttpServletRequestWrapper(req) {
-                @Override
-                public String getServletPath() {
-                    return url;
-                }
-            };
+            @Override
+            public String getServletPath() {
+                return "";
+            }
+
+            @Override
+            public String getPathInfo() {
+                return url;
+            }
+        };
     }
 }
