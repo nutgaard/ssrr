@@ -34,7 +34,7 @@
         <load-on-startup>1</load-on-startup>
         <init-param>
             <param-name>javax.ws.rs.Application</param-name>
-            <param-value>no.utgdev.ssrr.config.ApiConfig</param-value>
+            <param-value>no.utgdev.ssrr.config.AppConfig</param-value>
         </init-param>
     </servlet>
     <servlet-mapping>
