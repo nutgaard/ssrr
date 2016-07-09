@@ -6,6 +6,10 @@
 
     <display-name>SSRR</display-name>
 
+    <error-page>
+        <location>/error-page</location>
+    </error-page>
+
     <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>

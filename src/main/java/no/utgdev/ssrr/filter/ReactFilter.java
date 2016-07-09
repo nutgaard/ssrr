@@ -25,7 +25,6 @@ import java.io.*;
 import java.util.function.BiConsumer;
 
 public class ReactFilter extends ContentTransformationFilter {
-    private static final String frontendpath = "./../../../../../frontend/";
     private static final ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
     private static final Invocable invocable = (Invocable) engine;
 
@@ -33,7 +32,6 @@ public class ReactFilter extends ContentTransformationFilter {
     static {
         try {
             engine.eval(read("nashorn-polyfill.js"));
-            engine.eval(read("jvm-npm.js"));
             engine.eval(read("bundle-server.js"));
         } catch (ScriptException e) {
             e.printStackTrace();
@@ -61,12 +59,17 @@ public class ReactFilter extends ContentTransformationFilter {
 
             BiConsumer<Integer, String> reply = (status, reactContent) -> {
                 try {
+                    if (status == 404) {
+                        resp.sendError(404);
+                        return;
+                    }
 
                     Element reactElement = docBuilder.parse(toInputStream(reactContent)).getDocumentElement();
                     node.appendChild(html.importNode(reactElement, true));
                     String newContent = convertToString(html).replaceAll("\\n", "").replaceAll("\\r", "");
 
                     resp.setContentLength(newContent.length());
+                    resp.setStatus(status);
                     resp.getWriter().write(newContent);
                 } catch (TransformerException | SAXException | IOException e) {
                     e.printStackTrace();
