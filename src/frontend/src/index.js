@@ -1,33 +1,15 @@
 import React from "react";
 import {render} from "react-dom";
-import {Router, Route, browserHistory} from "react-router";
+import routesConfig from './routes.json';
+import { buildRouter } from './routebuilder';
+import { Router, Route, browserHistory } from "react-router";
 
-function Application({ children }) {
-    return React.Children.only(children);
-}
+// pages
+import Application from './pages/application';
+import Home from './pages/home';
+import About from './pages/about';
 
-function Home() {
-    return (
-        <h1>home</h1>
-    );
-}
+const router = buildRouter(routesConfig.routes, { Application, Home, About });
 
-function About() {
-    return (
-        <h1>about</h1>
-    );
-}
-
-function Routes() {
-    return (
-        <Router history={browserHistory}>
-            <Route component={Application}>
-                <Route path="home" component={Home}/>
-                <Route path="about" component={About}/>
-                <Route path="*" component={Home}/>
-            </Route>
-        </Router>
-    );
-}
-
-render(<Routes />, document.querySelector('#application'));
+render(router, document.querySelector('#application'));
+    

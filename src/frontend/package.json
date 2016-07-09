@@ -5,7 +5,9 @@
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "browserify ./src/index.js -o ./../main/webapp/bundle.js -t [ babelify ]",
+    "build:react": "cp ./node_modules/react/dist/react.js ./../main/resources/no/utgdev/ssrr/filter/react.js && cp ./node_modules/react-dom/dist/react-dom-server.js ./../main/resources/no/utgdev/ssrr/filter/react-dom-server.js",
+    "build:bundle": "browserify ./src/index.js -o ./../main/webapp/bundle.js -t [ babelify ]",
+    "build": "npm run build:react && npm run build:bundle",
     "watch": "npm run build && watchify ./src/index.js -o ./../main/webapp/bundle.js -t [ babelify ] -v"
   },
   "repository": {

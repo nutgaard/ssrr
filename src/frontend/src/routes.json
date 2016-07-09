@@ -1,0 +1,20 @@
+{
+    "routes": {
+        "component": "Application",
+        "children": [
+            {
+                "path": "home",
+                "component": "Home"
+            },
+            {
+                "path": "about",
+                "component": "About"
+            },
+            {
+                "path": "*",
+                "component": "Home"
+            }
+        ]
+    },
+    "renderInto": "application"
+}
