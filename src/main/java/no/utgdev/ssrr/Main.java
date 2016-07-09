@@ -10,9 +10,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
-public class Main extends HttpServlet {
+import static no.utgdev.ssrr.Utils.filepattern;
 
-    private static Pattern filepattern = Pattern.compile("\\..{1,4}$");
+public class Main extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
