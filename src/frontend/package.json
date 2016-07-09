@@ -7,8 +7,11 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build:react": "cp ./node_modules/react/dist/react.js ./../main/resources/no/utgdev/ssrr/filter/react.js && cp ./node_modules/react-dom/dist/react-dom-server.js ./../main/resources/no/utgdev/ssrr/filter/react-dom-server.js",
     "build:bundle": "browserify ./src/index.js -o ./../main/webapp/bundle.js -t [ babelify ]",
-    "build": "npm run build:react && npm run build:bundle",
-    "watch": "npm run build && watchify ./src/index.js -o ./../main/webapp/bundle.js -t [ babelify ] -v"
+    "build:bundle-server": "browserify ./src/serverside.js -o ./../main/resources/no/utgdev/ssrr/filter/bundle-server.js -t [ babelify ]",
+    "build": "npm run build:react && npm run build:bundle && npm run build:bundle-server",
+    "watch:bundle": "watchify ./src/index.js -o ./../main/webapp/bundle.js -t [ babelify ] -v",
+    "watch:bundle-server": "watchify ./src/serverside.js -o ./../main/resources/no/utgdev/ssrr/filter/bundle-server.js -t [ babelify ] -v",
+    "watch": "npm run build && npm run watch:bundle | npm run watch:bundle-server"
   },
   "repository": {
     "type": "git",

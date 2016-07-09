@@ -1,15 +1,13 @@
 import React from "react";
-import {render} from "react-dom";
-import routesConfig from './routes.json';
-import { buildRouter } from './routebuilder';
+import { render } from "react-dom";
+import routes from './routes';
 import { Router, Route, browserHistory } from "react-router";
 
-// pages
-import Application from './pages/application';
-import Home from './pages/home';
-import About from './pages/about';
-
-const router = buildRouter(routesConfig.routes, { Application, Home, About });
+const router = (
+    <Router history={browserHistory}>
+        {routes}
+    </Router>
+);
 
 render(router, document.querySelector('#application'));
     

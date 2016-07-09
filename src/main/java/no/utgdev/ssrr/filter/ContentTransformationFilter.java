@@ -9,9 +9,9 @@ import java.io.IOException;
 public class ContentTransformationFilter implements Filter {
 
     private FilterConfig filterConfig;
-    private TriFunction<HttpServletRequest, FilterConfig, String, String> transformation;
+    private QuadFunction<HttpServletRequest, HttpServletResponse, FilterConfig, String, String> transformation;
 
-    public ContentTransformationFilter(TriFunction<HttpServletRequest, FilterConfig, String, String> transformation) {
+    public ContentTransformationFilter(QuadFunction<HttpServletRequest, HttpServletResponse, FilterConfig, String, String> transformation) {
         this.transformation = transformation;
     }
 
@@ -33,14 +33,12 @@ public class ContentTransformationFilter implements Filter {
         String content = capturingResponseWrapper.getCaptureAsString();
         boolean isHtml = response.getContentType() != null && response.getContentType().contains("text/html");
 
-        String output = content;
         if (isHtml) {
-            output = transformation.apply(httpReq, filterConfig, content);
+            transformation.apply(httpReq, httpResp, filterConfig, content);
+        } else {
+            response.setContentLength(content.length());
+            response.getWriter().write(content);
         }
-
-
-        response.setContentLength(output.length());
-        response.getWriter().write(output);
     }
 
     public void destroy() {

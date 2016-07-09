@@ -1,36 +1,46 @@
 package no.utgdev.ssrr.filter;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.servlet.FilterConfig;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.*;
 import java.io.*;
+import java.util.function.BiConsumer;
 
 public class ReactFilter extends ContentTransformationFilter {
     private static final String frontendpath = "./../../../../../frontend/";
     private static final ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
+    private static final Invocable invocable = (Invocable) engine;
+
 
     static {
         try {
             engine.eval(read("nashorn-polyfill.js"));
             engine.eval(read("jvm-npm.js"));
-            engine.eval(read("react.js"));
-            engine.eval(read("react-dom-server.js"));
+            engine.eval(read("bundle-server.js"));
         } catch (ScriptException e) {
             e.printStackTrace();
         }
     }
 
-    private static TriFunction<HttpServletRequest, FilterConfig, String, String> transformation = (req, filterConfig, content) -> {
+    private static QuadFunction<HttpServletRequest, HttpServletResponse, FilterConfig, String, String> transformation = (req, resp, filterConfig, content) -> {
         if (content == null) {
             return "";
         }
@@ -43,12 +53,45 @@ public class ReactFilter extends ContentTransformationFilter {
 
             Node node = (Node) renderDiv.evaluate(html, XPathConstants.NODE);
 
+            String requestUrl = req.getRequestURI();
+            if (req.getQueryString() != null) {
+                requestUrl += '?' + req.getQueryString();
+            }
+
+
+            BiConsumer<Integer, String> reply = (status, reactContent) -> {
+                try {
+
+                    Element reactElement = docBuilder.parse(toInputStream(reactContent)).getDocumentElement();
+                    node.appendChild(html.importNode(reactElement, true));
+                    String newContent = convertToString(html).replaceAll("\\n", "").replaceAll("\\r", "");
+
+                    resp.setContentLength(newContent.length());
+                    resp.getWriter().write(newContent);
+                } catch (TransformerException | SAXException | IOException e) {
+                    e.printStackTrace();
+                }
+            };
+
+
+            invocable.invokeFunction("render", requestUrl, reply);
             return content;
-        } catch (ParserConfigurationException | SAXException | IOException | XPathExpressionException e) {
+
+        } catch (ParserConfigurationException | NoSuchMethodException | ScriptException | SAXException | IOException | XPathExpressionException e) {
             e.printStackTrace();
             return content;
         }
     };
+
+    private static String convertToString(Document doc) throws TransformerException {
+        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        DOMSource source = new DOMSource(doc);
+        StringWriter stringWriter = new StringWriter();
+
+        transformer.transform(source, new StreamResult(stringWriter));
+
+        return stringWriter.toString();
+    }
 
     private static InputStream toInputStream(String content) {
         try {
